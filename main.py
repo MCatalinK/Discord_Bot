@@ -1,63 +1,56 @@
 import discord
 import os
+import youtube_dl
 
 from discord.ext import commands
+from discord.ext.commands import has_permissions, MissingPermissions
 from Functionality.WeatherConfiguration import WeatherConfiguration
 from Functionality.GifConfiguration import GifConfiguration
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD')
-prefix = '.'
 
-client = discord.Client()
-bot = commands.Bot(command_prefix='.')
+bot = commands.Bot(command_prefix='.', case_insensitive=True)
 
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f'We have logged in as {client.user.name}!')
+    print("Logged In!")
+
+@bot.command()
+async def load(ctx,extension):
+    bot.load_extension(f'cogs.{extension}')
+
+    @bot.command()
+    async def unload(ctx, extension):
+        bot.unload_extension(f'cogs.{extension}')
+
+@bot.command(help="Returns a weather report based on a city.", pass_context=True)
+async def weather(ctx, location):
+    if location is None:
+        await ctx.send("You need to introduce a city!")
+    try:
+        weather = WeatherConfiguration(location)
+        await ctx.send(weather)
+    except:
+        await ctx.send("We couldn't identify the city!")
 
 
-@client.event
-async def on_member_join(member):
-    server = member.guild
-
-    await member.create_dm()
-    await member.dm_channel.send(
-        f'Hi {member.name}, we are glad to have you on {server}!'
-    )
-
-
-@client.event
-async def on_message(message):
-    msg = message.content.lower()
-    if message.author == client.user:
-        return
-
-    if msg.startswith('hello' or 'hey'):
-        await message.channel.send(f'Hello {message.author.mention}! I hope your day is going great! ^^')
-
-    if msg.startswith('.weather'):
-        location = msg.split(".weather ", 1)[1]
-        if location is None:
-            await message.channel.send("You need to introduce a city!")
-        try:
-            weather = WeatherConfiguration(location)
-            await message.channel.send(weather)
-        except:
-            await message.channel.send("We couldn't identify the city!")
-
-    if msg.startswith('.gif'):
-        search_term = msg.split('.gif ', 1)[1]
-        gifs = GifConfiguration(search_term)
-        try:
-            gif_url = gifs.get_gif()
-            embed = discord.Embed(title=search_term)
-            embed.set_image(url=gif_url)
-            await message.channel.send(embed=embed)
-        except:
-            await message.channel.send("We couldn't find the gif")
+@bot.command(help="Returns a gif based on a keyword of your choice.", pass_context=True, )
+async def gif(ctx, keyword):
+    gifs = GifConfiguration(keyword)
+    try:
+        gif_url = gifs.get_gif()
+        embed = discord.Embed(title=keyword)
+        embed.set_image(url=gif_url)
+        await ctx.send(embed=embed)
+    except:
+        await ctx.send("We couldn't find the gif")
 
 
-client.run(TOKEN)
+for file in os.listdir('./cogs'):
+    if file.endswith('.py'):
+        bot.load_extension(f'cogs.{file[:-3]}')
+
+bot.run(TOKEN)
