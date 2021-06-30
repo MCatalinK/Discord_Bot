@@ -1,56 +1,31 @@
 import discord
 import os
-import youtube_dl
 
 from discord.ext import commands
-from discord.ext.commands import has_permissions, MissingPermissions
-from Functionality.WeatherConfiguration import WeatherConfiguration
-from Functionality.GifConfiguration import GifConfiguration
+from discord.ext.commands import has_permissions
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD')
 
-bot = commands.Bot(command_prefix='.', case_insensitive=True)
+client = commands.Bot(command_prefix='.', case_insensitive=True)
+client.remove_command('help')
 
 
-@bot.event
-async def on_ready():
-    print("Logged In!")
-
-@bot.command()
-async def load(ctx,extension):
-    bot.load_extension(f'cogs.{extension}')
-
-    @bot.command()
-    async def unload(ctx, extension):
-        bot.unload_extension(f'cogs.{extension}')
-
-@bot.command(help="Returns a weather report based on a city.", pass_context=True)
-async def weather(ctx, location):
-    if location is None:
-        await ctx.send("You need to introduce a city!")
-    try:
-        weather = WeatherConfiguration(location)
-        await ctx.send(weather)
-    except:
-        await ctx.send("We couldn't identify the city!")
+@client.command()
+@has_permissions(administrator=True)
+async def load(ctx, extension):
+    client.load_extension(f'cogs.{extension}')
 
 
-@bot.command(help="Returns a gif based on a keyword of your choice.", pass_context=True, )
-async def gif(ctx, keyword):
-    gifs = GifConfiguration(keyword)
-    try:
-        gif_url = gifs.get_gif()
-        embed = discord.Embed(title=keyword)
-        embed.set_image(url=gif_url)
-        await ctx.send(embed=embed)
-    except:
-        await ctx.send("We couldn't find the gif")
+@client.command()
+@has_permissions(administrator=True)
+async def unload(ctx, extension):
+    client.unload_extension(f'cogs.{extension}')
 
 
 for file in os.listdir('./cogs'):
     if file.endswith('.py'):
-        bot.load_extension(f'cogs.{file[:-3]}')
+        client.load_extension(f'cogs.{file[:-3]}')
 
-bot.run(TOKEN)
+client.run(TOKEN)
