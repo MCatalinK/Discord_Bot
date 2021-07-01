@@ -22,7 +22,7 @@ class WeatherReport(commands.Cog):
         return kmph
 
     @commands.command()
-    async def weather(self, ctx, loc):
+    async def weather(self, ctx, *, loc):
         location = self.mgr.weather_at_place(loc)
         weather = location.weather
         temp = weather.temperature('celsius')['temp']
@@ -57,7 +57,7 @@ class WeatherReport(commands.Cog):
         await ctx.message.delete(delay=5)
 
     @commands.command()
-    async def forecast(self, ctx, loc, hour: int):
+    async def forecast(self, ctx, hour: int, *, loc):
         forecast = self.mgr.forecast_at_place(loc, '3h')
         tmr = timestamps.tomorrow(hour, 0)
         weather = forecast.get_weather_at(tmr)

@@ -15,7 +15,7 @@ class BotSetup(commands.Cog):
         print("Logged In!")
         await self.client.change_presence(
             status=discord.Status.dnd,
-            activity=discord.Game(name='Next Gen AI')
+            activity=discord.Game(name='.help')
         )
 
     @commands.command()
@@ -35,7 +35,7 @@ class BotSetup(commands.Cog):
             inline=False
         )
         embed.add_field(
-            name='.forecast [city/zipcode] [hour]',
+            name='.forecast [hour] [city/zipcode]',
             value='It returns the forecast for tomorrow at the specified hour',
             inline=False
         )
@@ -66,8 +66,25 @@ class BotSetup(commands.Cog):
         )
         if ctx.message.author.guild_permissions.manage_messages:
             embed.add_field(
-                name='.clear [number] //moderator',
+                name='.clear [number]',
                 value='Delete the last [number] of messages',
+                inline=False
+            )
+        if ctx.message.author.guild_permissions.kick_members:
+            embed.add_field(
+                name='.kick [member] [reason]',
+                value='Kick a member from the server',
+                inline=False
+            )
+        if ctx.message.author.guild_permissions.ban_members:
+            embed.add_field(
+                name='.ban [member] [reason]',
+                value='Ban a member from the server',
+                inline=False
+            )
+            embed.add_field(
+                name='.unban [member]',
+                value='Unban a member from the server',
                 inline=False
             )
 

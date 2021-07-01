@@ -14,7 +14,7 @@ class GifFinder(commands.Cog):
         self.client = client
 
     @commands.command()
-    async def gif(self, ctx, keyword):
+    async def gif(self, ctx, *, keyword):
         search_term = keyword
         request = requests.get("https://g.tenor.com/v1/random?q=%s&key=%s&limit=%s" % (search_term, self.GifToken, 1))
         data = request.json()
