@@ -18,7 +18,8 @@ class GifFinder(commands.Cog):
         search_term = keyword
         request = requests.get("https://g.tenor.com/v1/random?q=%s&key=%s&limit=%s" % (search_term, self.GifToken, 1))
         data = request.json()
-        embed = discord.Embed(title=keyword)
+        embed = discord.Embed(title=keyword,
+                              colour=discord.Colour.green())
         embed.set_image(url=data['results'][0]['media'][0]['gif']['url'])
         await ctx.send(embed=embed)
 

@@ -1,6 +1,6 @@
-import discord
+
 from discord.ext import commands
-from discord.ext.commands import has_permissions, MissingPermissions
+from discord.ext.commands import has_permissions
 
 
 class Moderator(commands.Cog):
@@ -11,7 +11,7 @@ class Moderator(commands.Cog):
     @commands.command()
     @has_permissions(manage_messages=True)
     async def clear(self, ctx, amount=5):
-        await ctx.channel.purge(limit=amount)
+        await ctx.channel.purge(limit=amount+1)
 
 
 def setup(client):
